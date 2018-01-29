@@ -226,6 +226,23 @@ func (b *HitBtc) CancelOrder(currencyPair string) (orders []Order, err error) {
     return
 }
 
+func (b *HitBtc) CancelOrderByClientID(clientOrderID string) (order Order, err error) {
+	resource := fmt.Sprintf("order/%s", clientOrderID)
+	r, err := b.client.do("DELETE", resource, nil, true)
+	if err != nil {
+		return
+	}
+	var response interface{}
+	if err = json.Unmarshal(r, &response); err != nil {
+		return
+	}
+	if err = handleErr(response); err != nil {
+		return
+	}
+	err = json.Unmarshal(r, &order)
+	return
+}
+
 func (b *HitBtc) GetOrder(orderId string) (orders []Order, err error) {
     payload := make(map[string]string)
     payload["clientOrderId"] = orderId
